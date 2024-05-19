@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'Website_CRM',
     'rest_framework',
+    'phonenumber_field',
+    'rest_framework.authtoken',
     'location_field.apps.DefaultConfig',
 ]
 AUTH_USER_MODEL = 'Website_CRM.CRM_User'
