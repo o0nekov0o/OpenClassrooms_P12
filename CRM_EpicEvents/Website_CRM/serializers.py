@@ -32,6 +32,8 @@ class CustomerSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class ContractSerializer(serializers.HyperlinkedModelSerializer):
+    serializer_related_field = serializers.PrimaryKeyRelatedField
+
     class Meta:
         model = models.Contract
         fields = ['customer', 'commercial_contact', 'total_amount',
@@ -46,6 +48,7 @@ class FilterForEvent(serializers.PrimaryKeyRelatedField):
 
 class EventSerializer(serializers.HyperlinkedModelSerializer):
     support_contact = FilterForEvent(many=False)
+    serializer_related_field = serializers.PrimaryKeyRelatedField
 
     class Meta:
         model = models.Event
