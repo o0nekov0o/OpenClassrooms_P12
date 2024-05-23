@@ -52,4 +52,3 @@ class EventSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['contract', 'customer_name', 'customer_contact', 'event_start_date',
                   'event_end_date', 'support_contact', 'location', 'attendees', 'notes', 'url']
         extra_kwargs = {'customer_name': {'read_only': True}, 'customer_contact': {'read_only': True}, }
-
