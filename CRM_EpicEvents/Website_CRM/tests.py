@@ -1,56 +1,10 @@
+import os, sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from CRM_EpicEvents import wsgi
 from django.test import TestCase
 from rest_framework import status
 from Website_CRM import models, serializers
 
-
-class CommonCase(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        new_user_1_data = {
-            'username': 'o0nekov0o',
-            'password': 'test_123',
-            'first_name': 'admin',
-            'last_name': 'webmaster',
-            'email': 'admin@gmail.com',
-            'collaborator_type': 0,
-        }
-        new_user_1_test = models.CRM_User.objects.create_user(**new_user_1_data)
-        new_user_2_data = {
-            'creator': new_user_1_test,
-            'username': 'new_user',
-            'password': 'new_password',
-            'first_name': 'donald',
-            'last_name': 'mitchell',
-            'email': 'mitch@gmail.com',
-            'collaborator_type': 2,
-        }
-        new_user_2_test = models.CRM_User.objects.create_user(**new_user_2_data)
-        new_customer_1_data = {
-            'information': 'New Customer Unlocked',
-            'full_name': 'John Doe the One',
-            'email': 'johndoe_theone@gmail.com',
-            'phone_number': '+33701020304',
-            'enterprise_name': 'Anonymous Enterprise',
-            'commercial_contact': new_user_1_test
-        }
-        new_customer_1_test = models.Customer.objects.create(**new_customer_1_data)
-        new_contract_1_data = {
-            'customer': new_customer_1_test,
-            'total_amount': 500,
-            'unpaid_amount': 250,
-            'contract_state': 1,
-        }
-        new_contract_1_test = models.Contract.objects.create(**new_contract_1_data)
-        new_event_1_data = {
-            'contract': new_contract_1_test,
-            'event_start_date': '2025-04-23T18:25:43.511Z',
-            'event_end_date': '2025-04-24T18:25:43.511Z',
-            'support_contact': new_user_2_test,
-            'location': 'Paris',
-            'attendees': 500,
-            'notes': '500 attendees',
-        }
-        new_event_1_test = models.Event.objects.create(**new_event_1_data)
 
 class TestCaseCrmUser(TestCase):
 
