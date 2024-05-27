@@ -36,7 +36,7 @@ class ContractSerializer(serializers.HyperlinkedModelSerializer):
         model = models.Contract
         fields = ['customer', 'commercial_contact', 'total_amount',
                   'unpaid_amount', 'contract_state', 'url']
-        extra_kwargs = {'commercial_contact': {'read_only': True}, }
+        extra_kwargs = {'commercial_contact': {'read_only': True}, 'email': {'read_only': True}, }
 
 
 class FilterForEvent(serializers.PrimaryKeyRelatedField):

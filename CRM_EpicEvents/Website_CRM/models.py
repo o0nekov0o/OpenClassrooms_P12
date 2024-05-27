@@ -27,16 +27,23 @@ class Customer(models.Model):
     commercial_contact = models.ForeignKey(to=CRM_User, on_delete=models.CASCADE,
                                            related_name='customer_commercial_contact')
 
+    def __str__(self):
+        return "|| name : " + str(self.full_name) + " ||  mail : " + str(self.email) + " ||"
+
 
 class Contract(models.Model):
     customer = models.ForeignKey(to=Customer, on_delete=models.CASCADE)
     commercial_contact = models.CharField(max_length=128, null=False, blank=True)
+    email = models.EmailField(max_length=128, null=False, blank=True)
     total_amount = models.IntegerField(null=False, blank=False, validators=[MinValueValidator(0)])
     unpaid_amount = models.IntegerField(null=False, blank=False, validators=[MinValueValidator(0)])
-    creation_date = models.DateField("Date", auto_now_add=True)
+    creation_date = models.DateTimeField("Date", auto_now_add=True)
     STATE_CHOICES = ((0, 'Not Signed'),
                      (1, 'Signed'),)
     contract_state = models.IntegerField(choices=STATE_CHOICES, default=0, null=False, blank=False)
+
+    def __str__(self):
+        return "|| created on : " + str(self.creation_date) + " || for user : " + str(self.email) + " ||"
 
 
 @receiver(post_save, sender=Contract)
@@ -47,7 +54,8 @@ def auto_create_commercial_contact(instance, **kwargs):
     if kwargs.get('created', False):
         if instance.customer:
             instance.commercial_contact = instance.customer.commercial_contact.username
-            instance.save(update_fields=['commercial_contact'])
+            instance.email = instance.customer.email
+            instance.save(update_fields=['commercial_contact', 'email'])
 
 
 class Event(models.Model):
