@@ -32,13 +32,11 @@ class CustomerSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class ContractSerializer(serializers.HyperlinkedModelSerializer):
-    serializer_related_field = serializers.PrimaryKeyRelatedField
-
     class Meta:
         model = models.Contract
         fields = ['customer', 'commercial_contact', 'total_amount',
                   'unpaid_amount', 'contract_state', 'url']
-        extra_kwargs = {'commercial_contact': {'read_only': True}, }
+        extra_kwargs = {'commercial_contact': {'read_only': True}, 'email': {'read_only': True}, }
 
 
 class FilterForEvent(serializers.PrimaryKeyRelatedField):
@@ -48,15 +46,9 @@ class FilterForEvent(serializers.PrimaryKeyRelatedField):
 
 class EventSerializer(serializers.HyperlinkedModelSerializer):
     support_contact = FilterForEvent(many=False)
-    serializer_related_field = serializers.PrimaryKeyRelatedField
 
     class Meta:
         model = models.Event
         fields = ['contract', 'customer_name', 'customer_contact', 'event_start_date',
                   'event_end_date', 'support_contact', 'location', 'attendees', 'notes', 'url']
         extra_kwargs = {'customer_name': {'read_only': True}, 'customer_contact': {'read_only': True}, }
-
-    """def to_representation(self, instance):
-        rep = super(EventSerializer, self).to_representation(instance)
-        rep['contract'] = instance.contract.customer.email
-        return rep"""
