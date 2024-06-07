@@ -10,7 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
-import os
+import os, sentry_sdk
 from pathlib import Path
 from dotenv import load_dotenv, find_dotenv
 
@@ -102,6 +102,17 @@ DATABASES = {
         'PORT': os.getenv('DB_PORT'),
     }
 }
+
+sentry_sdk.init(
+    dsn="https://9891c54384471909061e03ca06f3582f@o4507330921824256.ingest.de.sentry.io/4507330925166672",
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for performance monitoring.
+    traces_sample_rate=1.0,
+    # Set profiles_sample_rate to 1.0 to profile 100%
+    # of sampled transactions.
+    # We recommend adjusting this value in production.
+    profiles_sample_rate=1.0,
+)
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
