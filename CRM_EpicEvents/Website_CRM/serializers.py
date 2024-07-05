@@ -31,7 +31,14 @@ class CustomerSerializer(serializers.HyperlinkedModelSerializer):
                   'enterprise_name', 'commercial_contact', 'url']
 
 
+class FilterForContract(serializers.PrimaryKeyRelatedField):
+    def get_queryset(self):
+        return models.Customer.objects.all()
+
+
 class ContractSerializer(serializers.HyperlinkedModelSerializer):
+    customer = FilterForContract(many=False)
+
     class Meta:
         model = models.Contract
         fields = ['customer', 'commercial_contact', 'total_amount',
@@ -44,8 +51,14 @@ class FilterForEvent(serializers.PrimaryKeyRelatedField):
         return models.CRM_User.objects.filter(collaborator_type=2)
 
 
+class NewFilterForEvent(serializers.PrimaryKeyRelatedField):
+    def get_queryset(self):
+        return models.Contract.objects.all()
+
+
 class EventSerializer(serializers.HyperlinkedModelSerializer):
     support_contact = FilterForEvent(many=False)
+    contract = NewFilterForEvent(many=False)
 
     class Meta:
         model = models.Event

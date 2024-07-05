@@ -14,11 +14,11 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from Website_CRM import views
 from django.contrib import admin
 from rest_framework import routers
 from django.urls import include, path
-from rest_framework.authtoken import views as token_path
+from Website_CRM import views, views_token
+from rest_framework.authtoken import views as login_token
 
 router = routers.DefaultRouter()
 router.register(r'permission', views.PermissionViewSet)
@@ -38,6 +38,14 @@ urlpatterns = [
     path('', include(router.urls)),
     path('admin/', admin.site.urls),
     path('sentry-debug/', trigger_error),
-    path('api-token-auth/', token_path.obtain_auth_token),
+    path('api-token-auth/', login_token.obtain_auth_token),
+    path('token_crm_users/<int:pk>/', views_token.CrmUserView.as_view()),
+    path('token_crm_users/', views_token.CrmUserView.as_view()),
+    path('token_customers/<int:pk>/', views_token.CustomerView.as_view()),
+    path('token_customers/', views_token.CustomerView.as_view()),
+    path('token_contracts/<int:pk>/', views_token.ContractView.as_view()),
+    path('token_contracts/', views_token.ContractView.as_view()),
+    path('token_events/<int:pk>/', views_token.EventView.as_view()),
+    path('token_events/', views_token.EventView.as_view()),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]

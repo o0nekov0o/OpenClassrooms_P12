@@ -1,13 +1,15 @@
 from django.db.models import Q
 from Website_CRM import models, serializers
+from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import Permission
 from django.contrib.auth.hashers import make_password
-from rest_framework import permissions, viewsets, response, status
+from rest_framework import authentication, permissions, views, response, status
+from rest_framework.decorators import authentication_classes, permission_classes
 
 
 class NonExistantUser(permissions.BasePermission):
     """
-    Just make sure nobody can access PermissionViewSet.
+    Just make sure nobody can access PermissionView.
     """
 
     def has_permission(self, request, view):
@@ -19,7 +21,7 @@ class NonExistantUser(permissions.BasePermission):
 class IsSuperUserOrCollaborator(permissions.BasePermission):
     """
     Ensure only admins and the management team can perform certain actions.
-    Then ViewSets that use this permission class can reduce authorizations.
+    Then Views that use this permission class can reduce authorizations.
     """
 
     def has_permission(self, request, view):
@@ -49,7 +51,7 @@ class IsSuperUserOrCollaborator(permissions.BasePermission):
         return False
 
 
-class PermissionViewSet(viewsets.ModelViewSet):
+class PermissionView(views.APIView):
     """
     API endpoint that allows permissions to be viewed or edited.
     """
@@ -58,7 +60,9 @@ class PermissionViewSet(viewsets.ModelViewSet):
     permission_classes = [NonExistantUser]
 
 
-class CustomerViewSet(viewsets.ModelViewSet):
+@permission_classes([IsSuperUserOrCollaborator])
+@authentication_classes([authentication.TokenAuthentication])
+class CustomerView(views.APIView):
     """
     API endpoint that allows customers to be viewed or edited.
     """
@@ -66,8 +70,23 @@ class CustomerViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.CustomerSerializer
     permission_classes = [IsSuperUserOrCollaborator]
 
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
+    def get_object(self, customer_id):
+        return get_object_or_404(self.queryset, id=customer_id)
+
+    def get(self, request, *args, **kwargs):
+        customer_id = self.kwargs
+        if customer_id:
+            serializer_context = {'request': request}
+            serializer = serializers.CustomerSerializer(
+                self.get_object(customer_id['pk']), context=serializer_context)
+        else:
+            serializer_context = {'request': request}
+            serializer = serializers.CustomerSerializer(
+                models.Customer.objects.order_by('-pk'), context=serializer_context, many=True)
+        return response.Response(serializer.data)
+
+    def delete(self, request, *args, **kwargs):
+        instance = self.get_object(self.kwargs['pk'])
         if request.user.is_superuser or request.user.collaborator_type == 0 \
                 or instance.creator == request.user:
             instance.__class__.objects.get(pk=instance.pk).delete()
@@ -75,10 +94,10 @@ class CustomerViewSet(viewsets.ModelViewSet):
         else:
             return response.Response(status=status.HTTP_401_UNAUTHORIZED)
 
-    def update(self, request, *args, **kwargs):
+    def put(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        instance = self.get_object(self.kwargs['pk'])
+        serializer = serializers.CustomerSerializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         changed_customer = serializer.validated_data
         information, full_name, email, phone_number, enterprise_name, commercial_contact = \
@@ -96,13 +115,13 @@ class CustomerViewSet(viewsets.ModelViewSet):
                 return response.Response(status=status.HTTP_401_UNAUTHORIZED)
         if request.user.is_superuser or request.user.collaborator_type == 0 \
                 or instance.creator == request.user:
-            self.perform_update(serializer)
+            serializer.save()
             return response.Response(status=status.HTTP_202_ACCEPTED)
         else:
             return response.Response(status=status.HTTP_401_UNAUTHORIZED)
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=self.request.data)
+    def post(self, request, *args, **kwargs):
+        serializer = serializers.CustomerSerializer(data=self.request.data)
         serializer.is_valid(raise_exception=True)
         new_customer = serializer.validated_data
         information, full_name, email, phone_number, enterprise_name, commercial_contact = \
@@ -123,7 +142,9 @@ class CustomerViewSet(viewsets.ModelViewSet):
             return response.Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
-class CrmUserViewSet(viewsets.ModelViewSet):
+@permission_classes([IsSuperUserOrCollaborator])
+@authentication_classes([authentication.TokenAuthentication])
+class CrmUserView(views.APIView):
     """
     API endpoint that allows crm_users to be viewed or edited.
     """
@@ -131,8 +152,23 @@ class CrmUserViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.CrmUserSerializer
     permission_classes = [IsSuperUserOrCollaborator]
 
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
+    def get_object(self, user_id):
+        return get_object_or_404(self.queryset, id=user_id)
+
+    def get(self, request, *args, **kwargs):
+        user_id = self.kwargs
+        if user_id:
+            serializer_context = {'request': request}
+            serializer = serializers.CrmUserSerializer(
+                self.get_object(user_id['pk']), context=serializer_context)
+        else:
+            serializer_context = {'request': request}
+            serializer = serializers.CrmUserSerializer(
+                models.CRM_User.objects.order_by('-pk'), context=serializer_context, many=True)
+        return response.Response(serializer.data)
+
+    def delete(self, request, *args, **kwargs):
+        instance = self.get_object(self.kwargs['pk'])
         if instance.is_superuser and not request.user.is_superuser:
             return response.Response(status=status.HTTP_401_UNAUTHORIZED)
         if request.user.is_superuser or instance.creator == request.user \
@@ -143,10 +179,10 @@ class CrmUserViewSet(viewsets.ModelViewSet):
         else:
             return response.Response(status=status.HTTP_401_UNAUTHORIZED)
 
-    def update(self, request, *args, **kwargs):
+    def put(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        instance = self.get_object(self.kwargs['pk'])
+        serializer = serializers.CrmUserSerializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         if instance.is_superuser and not request.user.is_superuser:
             return response.Response(status=status.HTTP_401_UNAUTHORIZED)
@@ -168,13 +204,13 @@ class CrmUserViewSet(viewsets.ModelViewSet):
                 or instance.collaborator_type in [1, 2] and request.user.collaborator_type == 0:
             password = serializer.validated_data['password']
             serializer.validated_data['password'] = make_password(password)
-            self.perform_update(serializer)
+            serializer.save()
             return response.Response(status=status.HTTP_202_ACCEPTED)
         else:
             return response.Response(status=status.HTTP_401_UNAUTHORIZED)
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=self.request.data)
+    def post(self, request, *args, **kwargs):
+        serializer = serializers.CrmUserSerializer(data=self.request.data)
         serializer.is_valid(raise_exception=True)
         new_crm_user = serializer.validated_data
         username, password, first_name, last_name, email, collaborator_type = \
@@ -194,7 +230,9 @@ class CrmUserViewSet(viewsets.ModelViewSet):
             return response.Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
-class ContractViewSet(viewsets.ModelViewSet):
+@permission_classes([IsSuperUserOrCollaborator])
+@authentication_classes([authentication.TokenAuthentication])
+class ContractView(views.APIView):
     """
     API endpoint that allows contracts to be viewed or edited.
     """
@@ -202,34 +240,49 @@ class ContractViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.ContractSerializer
     permission_classes = [IsSuperUserOrCollaborator]
 
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
+    def get_object(self, contract_id):
+        return get_object_or_404(self.queryset, id=contract_id)
+
+    def get(self, request, *args, **kwargs):
+        contract_id = self.kwargs
+        if contract_id:
+            serializer_context = {'request': request}
+            serializer = serializers.ContractSerializer(
+                self.get_object(contract_id['pk']), context=serializer_context)
+        else:
+            serializer_context = {'request': request}
+            serializer = serializers.ContractSerializer(
+                models.Contract.objects.order_by('-pk'), context=serializer_context, many=True)
+        return response.Response(serializer.data)
+
+    def delete(self, request, *args, **kwargs):
+        instance = self.get_object(self.kwargs['pk'])
         if request.user.is_superuser or request.user.collaborator_type == 0:
             instance.__class__.objects.get(pk=instance.pk).delete()
             return response.Response(status=status.HTTP_200_OK)
         else:
             return response.Response(status=status.HTTP_401_UNAUTHORIZED)
 
-    def update(self, request, *args, **kwargs):
+    def put(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        instance = self.get_object(self.kwargs['pk'])
+        serializer = serializers.ContractSerializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         changed_contract = serializer.validated_data
         customer, total_amount, unpaid_amount, contract_state = \
             changed_contract['customer'], changed_contract['total_amount'], \
-            changed_contract['unpaid_amount'],  changed_contract['contract_state']
+            changed_contract['unpaid_amount'], changed_contract['contract_state']
         if customer == '' or total_amount == '' or unpaid_amount == '' or contract_state == '':
             return response.Response(status=status.HTTP_401_UNAUTHORIZED)
         if request.user.is_superuser or request.user.collaborator_type == 0 \
                 or instance.customer.creator == request.user:
-            self.perform_update(serializer)
+            serializer.save()
             return response.Response(status=status.HTTP_202_ACCEPTED)
         else:
             return response.Response(status=status.HTTP_401_UNAUTHORIZED)
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=self.request.data)
+    def post(self, request, *args, **kwargs):
+        serializer = serializers.ContractSerializer(data=self.request.data)
         serializer.is_valid(raise_exception=True)
         new_contract = serializer.validated_data
         customer, total_amount, unpaid_amount, contract_state = \
@@ -245,7 +298,9 @@ class ContractViewSet(viewsets.ModelViewSet):
             return response.Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
-class EventsViewSet(viewsets.ModelViewSet):
+@permission_classes([IsSuperUserOrCollaborator])
+@authentication_classes([authentication.TokenAuthentication])
+class EventView(views.APIView):
     """
     API endpoint that allows events to be viewed or edited.
     """
@@ -253,8 +308,23 @@ class EventsViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.EventSerializer
     permission_classes = [IsSuperUserOrCollaborator]
 
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
+    def get_object(self, event_id):
+        return get_object_or_404(self.queryset, id=event_id)
+
+    def get(self, request, *args, **kwargs):
+        event_id = self.kwargs
+        if event_id:
+            serializer_context = {'request': request}
+            serializer = serializers.EventSerializer(
+                self.get_object(event_id['pk']), context=serializer_context)
+        else:
+            serializer_context = {'request': request}
+            serializer = serializers.EventSerializer(
+                models.Event.objects.order_by('-pk'), context=serializer_context, many=True)
+        return response.Response(serializer.data)
+
+    def delete(self, request, *args, **kwargs):
+        instance = self.get_object(self.kwargs['pk'])
         if request.user.is_superuser or request.user.collaborator_type == 0 \
                 or instance.contract.customer.creator == request.user:
             instance.__class__.objects.get(pk=instance.pk).delete()
@@ -262,10 +332,10 @@ class EventsViewSet(viewsets.ModelViewSet):
         else:
             return response.Response(status=status.HTTP_401_UNAUTHORIZED)
 
-    def update(self, request, *args, **kwargs):
+    def put(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        instance = self.get_object(self.kwargs['pk'])
+        serializer = serializers.EventSerializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         changed_event = serializer.validated_data
         contract, event_start_date, event_end_date, support_contact, location, attendees, notes = \
@@ -278,13 +348,13 @@ class EventsViewSet(viewsets.ModelViewSet):
         if request.user.is_superuser or request.user.collaborator_type == 0 \
                 or instance.contract.customer.creator == request.user \
                 or instance.support_contact == request.user:
-            self.perform_update(serializer)
+            serializer.save()
             return response.Response(status=status.HTTP_202_ACCEPTED)
         else:
             return response.Response(status=status.HTTP_401_UNAUTHORIZED)
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=self.request.data)
+    def post(self, request, *args, **kwargs):
+        serializer = serializers.EventSerializer(data=self.request.data)
         serializer.is_valid(raise_exception=True)
         new_event = serializer.validated_data
         contract, event_start_date, event_end_date, support_contact, location, attendees, notes = \

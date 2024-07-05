@@ -1,8 +1,8 @@
 import click
 from Click_CLI.users.commands import users
-# from Click_CLI.customers.commands import customers
-# from Click_CLI.contracts.commands import contracts
-# from Click_CLI.events.commands import events
+from Click_CLI.customers.commands import customers
+from Click_CLI.contracts.commands import contracts
+from Click_CLI.events.commands import events
 from Click_CLI.connect import login
 
 # https://stackoverflow.com/questions/34643620/how-can-i-split-my-click-commands-each-with-a-set-of-sub-commands-into-multipl
@@ -25,9 +25,9 @@ def cli(ctx, user, password):
 
 
 cli.add_command(users)
-# cli.add_command(customers)
-# cli.add_command(contracts)
-# cli.add_command(events)
+cli.add_command(customers)
+cli.add_command(contracts)
+cli.add_command(events)
 
 
 if __name__ == "__main__":

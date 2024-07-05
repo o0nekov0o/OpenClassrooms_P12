@@ -3,8 +3,6 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator
-from location_field.models.plain import PlainLocationField
-from phonenumber_field.modelfields import PhoneNumberField
 
 
 class CRM_User(AbstractUser):
@@ -20,7 +18,7 @@ class Customer(models.Model):
     information = models.TextField(max_length=2048, null=True, blank=True)
     full_name = models.CharField(max_length=128, null=False, blank=False)
     email = models.EmailField(max_length=128, null=False, blank=False, unique=True)
-    phone_number = PhoneNumberField(region="FR", null=False, blank=False)
+    phone_number = models.CharField(null=False, blank=False, max_length=12)
     enterprise_name = models.CharField(max_length=128, null=False, blank=False, )
     creation_date = models.DateField("Date", auto_now_add=True)
     last_update = models.DateField("Date", auto_now=True)
@@ -65,7 +63,7 @@ class Event(models.Model):
     event_start_date = models.DateTimeField(null=False, blank=False)
     event_end_date = models.DateTimeField(null=False, blank=False)
     support_contact = models.ForeignKey(to=CRM_User, on_delete=models.CASCADE, null=True, blank=True)
-    location = PlainLocationField(based_fields=['city'], zoom=7, null=False, blank=False)
+    location = models.CharField(null=False, blank=False, max_length=12)
     attendees = models.IntegerField(null=False, blank=False, validators=[MinValueValidator(0)])
     notes = models.TextField(max_length=2048, null=True, blank=True)
 

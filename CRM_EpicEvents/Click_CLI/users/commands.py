@@ -1,5 +1,5 @@
 import click
-from .link_api import create_user, delete_user, update_user, list_all_user, list_one_user
+from Click_CLI.users.link_api import create_user, delete_user, update_user, list_all_user, list_one_user
 from Click_CLI.constants import NULL_VALUE
 
 
@@ -9,15 +9,15 @@ def users():
 
 
 @users.command()
-@click.option("--username", prompt="New pseudo", help="...")
+@click.option("--username", prompt="New username", help="...")
 @click.option("--password", prompt="New password", hide_input=True, help="...")
-@click.option("--first_name", prompt="New first name", help="...")
+@click.option("--first_name", prompt="New first_name", help="...")
 @click.option("--last_name", prompt="New last_name", help="...")
 @click.option("--email", prompt="New email", help="...")
 @click.option(
     "--collaborator_type",
-    prompt="New collaborator_type",
-    type=click.Choice(["GES", "COM", "SUP"], case_sensitive=False),
+    prompt="New collaborator_type (0=GES, 1=COM, 2=SUP)",
+    type=click.Choice(['0', '1', '2'], case_sensitive=False),
     help="...",
 )
 @click.pass_context
@@ -31,26 +31,33 @@ def create(ctx, username, password, first_name, last_name, email, collaborator_t
 
 
 @users.command()
-@click.option("--user_id", prompt="User id to delete", help="...")
+@click.option("--pk", prompt="User id to delete", help="...")
 @click.pass_context
-def delete(ctx, user_id):
-    click.echo(f"Deleting user {user_id}")
-    ret, resume = delete_user(ctx.obj["TOKEN"], user_id)
+def delete(ctx, pk):
+    click.echo(f"Deleting user {pk}")
+    ret, resume = delete_user(ctx.obj["TOKEN"], pk)
     click.echo(f"return code {ret}")
     click.echo(f"resume {resume}")
 
 
 @users.command()
-@click.option("--user_id", prompt="User id to update", help="...")
+@click.option("--pk", prompt="User id to update", help="...")
 @click.option(
-    "--pseudo",
-    prompt="pseudo (leave blank if you don't want to change)",
+    "--username",
+    prompt="username (leave blank if you don't want to change)",
+    default=NULL_VALUE,
+    help="...",
+)
+@click.option(
+    "--password",
+    prompt="password (leave blank if you don't want to change)",
+    hide_input=True,
     default=NULL_VALUE,
     help="...",
 )
 @click.option(
     "--first_name",
-    prompt="first name (leave blank if you don't want to change)",
+    prompt="first_name (leave blank if you don't want to change)",
     default=NULL_VALUE,
     help="...",
 )
@@ -67,23 +74,16 @@ def delete(ctx, user_id):
     help="...",
 )
 @click.option(
-    "--role",
-    prompt="role (leave blank if you don't want to change)",
-    default=NULL_VALUE,
-    help="...",
-)
-@click.option(
-    "--password",
-    prompt="password (leave blank if you don't want to change)",
-    hide_input=True,
+    "--collaborator_type",
+    prompt="collaborator_type (leave blank if you don't want to change)",
     default=NULL_VALUE,
     help="...",
 )
 @click.pass_context
-def update(ctx, user_id, pseudo, first_name, last_name, email, role, password):
-    click.echo(f"update {user_id}")
+def update(ctx, pk, username, password, first_name, last_name, email, collaborator_type):
+    click.echo(f"update {pk}")
     ret, resume = update_user(
-        ctx.obj["TOKEN"], user_id, pseudo, first_name, last_name, email, role, password
+        ctx.obj["TOKEN"], pk, username, password, first_name, last_name, email, collaborator_type
     )
     click.echo(f"return code {ret}")
     click.echo(f"resume {resume}")
