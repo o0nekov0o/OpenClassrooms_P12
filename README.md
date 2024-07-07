@@ -49,7 +49,7 @@ SECRET_KEY sert à la journalisation et le suivi des erreurs via Sentry.\
 Dès à présent, le projet est prêt et le serveur peut être lancé via ces commandes,\
 En s'assurant en amont d'avoir démarré l'ensemble des dépendances :
 
-Se placer en racine du projet,
+Se placer en racine du projet,\
 puis depuis un poste Windows :
 ```bash
 python -m venv venv
@@ -62,7 +62,7 @@ puis de nouveau depuis le terminal :
 Set-ExecutionPolicy RemoteSigned
 venv/Scripts/activate
 ```
-Se placer en racine du projet,
+Se placer en racine du projet,\
 puis depuis un autre OS :
 ```bash
 python -m venv venv
