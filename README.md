@@ -96,13 +96,18 @@ Pour chacune de ces parties, il est possible de :
 - supprimer
 - visualiser des objets.
 
-Pour la partie user , on a le login et le refresh du token en plus.
-ex : on tape `python -m Click_CLI users create` , le programme invite l'utilisateur à saisir
+Pour chaque partie, un login est demandé avant chaque exécution d'action.\
+Par exemple, en saisissant la commande `python -m Click_CLI users create`,\
+Pour vérifier les permissions, le programme invite l'utilisateur à saisir :
 
 - son nom d'utilisateur
 - son mot de passe
 
-si l'utilisateur est référencé , un token est généré et l'utilisateur peut saisir les données de création une par une.
-Une fois toutes les données encodées , on fait appel à l'API qui renverra un code retour et un fichier au format
-json le cas échéant.
-Les erreurs d'encodage et fonctionnelles sont affichées également
+Si l'utilisateur est référencé, un token est généré pour l'authentifier.\
+L'utilisateur peut alors saisir les données de création une par une.
+Une fois toutes les données encodées, le programme sollicite l'API qui renverra :
+
+- soit un code retour (200 ou 400 selon succès ou échec de la commande)
+- soit un fichier json le cas échéant (commandes de visualisation).
+
+Les erreurs d'encodage et fonctionnelles sont affichées également.
