@@ -75,18 +75,27 @@ pip3 install -r requirements.txt
 python3 manage.py runserver
 ```
 
-## Déroulement du programme
+## Utilisation du programme
 
-Dans le répertoire racine lancer le ou les commandes suivantes
+Dans le répertoire racine,\
+lancer une des commandes suivantes :
 
-- python -m demo_api users
-- python -m demo_api customers
-- python -m demo_api contracts
-- python -m demo_api events
+```bash
+python -m demo_api users    
+python -m demo_api customers
+python -m demo_api contracts
+python -m demo_api events
+```
+La structure de l'API repose sur 4 parties,\
+Ces 4 parties étant les 4 modèles de l'application.\
+En exécutant les commandes précédentes,\
+on obtient pour chacune des parties de l'API.\
+Pour chacune de ces parties il est donc possible de : 
+- créer
+- mettre à jour
+- supprimer
+- visualiser des objets.
 
-ces commandes donnent l'aide pour chacune des parties de l'API
-Pour chacune de ces parties il est possible de créer , mettre à jour , supprimer , visualiser un ou plusieurs
-objets.
 Pour la partie user , on a le login et le refresh du token en plus.
 ex : on tape `python -m Click_CLI users create` , le programme invite l'utilisateur à saisir
 
