@@ -81,16 +81,16 @@ Dans le répertoire racine,\
 lancer une des commandes suivantes :
 
 ```bash
-python -m demo_api users    
-python -m demo_api customers
-python -m demo_api contracts
-python -m demo_api events
+python -m Click_CLI users    
+python -m Click_CLI customers
+python -m Click_CLI contracts
+python -m Click_CLI events
 ```
 La structure de l'API repose sur 4 parties,\
 Ces 4 parties étant les 4 modèles de l'application.\
 En exécutant les commandes précédentes,\
-on obtient pour chacune des parties de l'API.\
-Pour chacune de ces parties il est donc possible de : 
+on obtient de l'aide pour chacune des parties de l'API.\
+Pour chacune de ces parties, il est possible de : 
 - créer
 - mettre à jour
 - supprimer
