@@ -104,7 +104,7 @@ Pour vérifier les permissions, le programme invite l'utilisateur à saisir :
 - son mot de passe
 
 Si l'utilisateur est référencé, un token est généré pour l'authentifier.\
-L'utilisateur peut alors saisir les données de création une par une.
+L'utilisateur peut alors saisir les données de création une par une.\
 Une fois toutes les données encodées, le programme sollicite l'API qui renverra :
 
 - soit un code retour (200 ou 400 selon succès ou échec de la commande)
