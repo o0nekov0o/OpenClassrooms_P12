@@ -31,7 +31,7 @@ pour connecter votre serveur sur PgAdmin.
 
 Depuis PgAdmin, créer une nouvelle base de données sur votre serveur.\
 Via un clic droit sur votre base de données, faites un *Restore*\
-Sélectionner maintenant le fichier database.sql présent dans le projet.\
+Sélectionner maintenant le fichier *database.sql* présent dans le projet.\
 Maintenant que les données du projet sont bien initialisées,\
 Créer un fichier .env en racine du projet que vous compléterez comme ceci :\
 (DH_HOST et DB_PORT étant généralement ceux par défaut)
@@ -46,10 +46,11 @@ SECRET_KEY=django-insecure-n2wl_y!1kei7%(9a+l81yx^y%_*pd6+5g*!f#$_&bxm*6@hvpd
 ```
 
 SECRET_KEY sert à la journalisation et le suivi des erreurs via Sentry.\
-Dès à présent, le projet est prêt et le serveur peut être lancé via cette commande,\
+Dès à présent, le projet est prêt et le serveur peut être lancé via ces commandes,\
 En s'assurant en amont d'avoir démarré l'ensemble des dépendances :
 
-Depuis un poste Windows :
+Se placer en racine du projet,
+puis depuis un poste Windows :
 ```bash
 python -m venv venv
 call venv/Scripts/activate.bat
@@ -61,7 +62,8 @@ puis de nouveau depuis le terminal :
 Set-ExecutionPolicy RemoteSigned
 venv/Scripts/activate
 ```
-Depuis un autre OS :
+Se placer en racine du projet,
+puis depuis un autre OS :
 ```bash
 python -m venv venv
 source venv/bin/activate
