@@ -96,8 +96,6 @@ class CustomerViewSet(viewsets.ModelViewSet):
                 return response.Response(status=status.HTTP_401_UNAUTHORIZED)
         if request.user.is_superuser or request.user.collaborator_type == 0 \
                 or instance.creator == request.user:
-            password = serializer.validated_data['password']
-            serializer.validated_data['password'] = make_password(password)
             self.perform_update(serializer)
             return response.Response(status=status.HTTP_202_ACCEPTED)
         else:
