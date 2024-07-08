@@ -77,7 +77,7 @@ python3 manage.py runserver
 
 ## Utilisation du programme
 
-Dans le répertoire racine,\
+Dans le répertoire CRM_EpicEvents,\
 lancer une des commandes suivantes :
 
 ```bash
