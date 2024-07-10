@@ -253,6 +253,10 @@ class ContractView(views.APIView):
             serializer_context = {'request': request}
             serializer = serializers.ContractSerializer(
                 models.Contract.objects.order_by('-pk'), context=serializer_context, many=True)
+            if request.user.collaborator_type == 1:
+                serializer = serializers.ContractSerializer(
+                    models.Contract.objects.filter(Q(contract_state=0) | Q(unpaid_amount__gt=0)),
+                    context=serializer_context, many=True)
         return response.Response(serializer.data)
 
     def delete(self, request, *args, **kwargs):
@@ -321,6 +325,10 @@ class EventView(views.APIView):
             serializer_context = {'request': request}
             serializer = serializers.EventSerializer(
                 models.Event.objects.order_by('-pk'), context=serializer_context, many=True)
+            if request.user.collaborator_type == 2:
+                serializer = serializers.EventSerializer(
+                    models.Event.objects.filter(support_contact=request.user),
+                    context=serializer_context, many=True)
         return response.Response(serializer.data)
 
     def delete(self, request, *args, **kwargs):
