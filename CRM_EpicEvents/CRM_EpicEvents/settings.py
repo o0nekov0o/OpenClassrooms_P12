@@ -52,13 +52,6 @@ INSTALLED_APPS = [
 ]
 AUTH_USER_MODEL = 'Website_CRM.CRM_User'
 
-LOCATION_FIELD = {
-    'provider.google.api': '//maps.google.com/maps/api/js?sensor=false',
-    'provider.google.api_key': os.environ['traces_email_password'],
-    'provider.google.api_libraries': '',
-    'provider.google.map.type': 'ROADMAP',
-}
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
